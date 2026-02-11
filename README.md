@@ -1,7 +1,122 @@
-# Sample Hardhat 3 Beta Project (minimal)
+# Dice Ethereum Smart Contract
 
-This project has a minimal setup of Hardhat 3 Beta, without any plugins.
+A decentralized dice game on Ethereum, implemented in Solidity. Players can place bets with ETH and roll a virtual 5–100 sided dice. The contract supports adjustable house edge and safe payout calculations.
 
-## What's included?
+---
 
-The project includes native support for TypeScript, Hardhat scripts, tasks, and support for Solidity compilation and tests.
+## Features
+
+- **Non-uniform payout logic**: Higher-risk bets pay more than low-risk bets.
+- **Max payout limit**: Ensures the contract cannot overpay and fail transactions.
+- **Reentrancy protection**: Prevents reentrancy attacks using `ReentrancyGuard`.
+- **Adjustable game parameters**: Minimum/maximum bets and house edge configurable.
+- **Pause/unpause**: Game can be temporarily disabled.
+- **Withdrawal**: Deployer can withdraw contract balance.
+
+---
+
+## Contract Details
+
+### Game Rules
+
+- Roll is generated pseudo-randomly in the range **5–100**.
+- Players can bet `rollUnder` or `rollOver`:
+  - `rollUnder = true`: win if dice < target
+  - `rollUnder = false`: win if dice > target
+- Payout formula ensures:
+  - High-risk bets get higher multipliers
+  - Maximum payout capped at **2x**
+  - House edge applied in basis points (`houseEdgeBps`)
+
+### Important Events
+
+- `GamePlayed(address indexed player, uint64 indexed gameId, uint256 betAmount, uint256 roll, uint256 payout)`
+- `Paused()`
+- `Unpaused()`
+
+---
+
+## Deployment & Initialization
+
+```solidity
+// Deploy the contract (payable if needed)
+Dice dice = new Dice{value: initialBalance}();
+
+// Initialize game parameters
+dice.initialize(
+    minBet,      // Minimum ETH bet (wei)
+    maxBet,      // Maximum ETH bet (wei)
+    houseEdgeBps // House edge in basis points (e.g., 1000 = 10%)
+);
+```
+
+---
+
+## Usage
+
+### Place a Bet
+
+```solidity
+dice.play(target, rollUnder, { value: betAmount });
+```
+
+- `target`: Number between 5–100
+- `rollUnder`: Boolean indicating roll under or over
+- `betAmount`: Amount of ETH to bet
+
+**Note:** The contract ensures the bet is within `[minBet, maxBet]` and payout does not exceed contract balance.
+
+### Withdraw ETH (Deployer Only)
+
+```solidity
+dice.withdraw(amount);
+```
+
+- Withdraw ETH from the contract. Cannot exceed current balance.
+- Only the deployer can call this.
+
+### Pause / Unpause
+
+```solidity
+dice.pause();   // Disable betting
+dice.unpause(); // Enable betting
+```
+
+---
+
+## Security Notes
+
+- **Reentrancy**: `play` is protected with `nonReentrant`.
+- **Payout Safety**: Maximum multiplier limited; payouts exceeding contract balance will revert.
+- **Randomness**: Currently pseudo-random using `keccak256(block.timestamp, msg.sender, gameCounter)`. (Not secure for production.)
+- **Minimum Bet**: Low bets (<0.01 ETH) may be truncated to 0 in payout due to integer math; use appropriate minBet.
+
+---
+
+## Frontend Integration
+
+- Listen to `GamePlayed` events to update UI.
+- Show `payout` and `roll` visually.
+- Ensure users know minimum bet and max payout.
+
+---
+
+## Example
+
+```javascript
+import { ethers } from "ethers";
+import DiceABI from "./DiceABI.json";
+
+const provider = new ethers.providers.Web3Provider(window.ethereum);
+const signer = provider.getSigner();
+const dice = new ethers.Contract(DICE_ADDRESS, DiceABI, signer);
+
+// Place a 0.01 ETH bet under 50
+const tx = await dice.play(50, true, { value: ethers.utils.parseEther("0.01") });
+await tx.wait();
+
+// Listen to GamePlayed events
+dice.on("GamePlayed", (player, gameId, betAmount, roll, payout) => {
+    console.log(player, gameId.toString(), ethers.utils.formatEther(betAmount), roll.toString(), ethers.utils.formatEther(payout));
+});
+```
