@@ -1,0 +1,39 @@
+body {
+    margin: 0;
+    background: radial-gradient(circle at top, #1a1a1a, #000);
+    color: white;
+    font-family: system-ui, sans-serif;
+}
+
+.container {
+    max-width: 500px;
+    margin: 60px auto;
+    text-align: center;
+}
+
+.card {
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(12px);
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: 0 0 30px rgba(255, 80, 120, 0.2);
+}
+
+button {
+    border: none;
+    border-radius: 12px;
+    padding: 12px 20px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.play-btn {
+    background: linear-gradient(135deg, #ff3c78, #ff8c42);
+    color: white;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.play-btn:hover {
+    transform: scale(1.05);
+}
