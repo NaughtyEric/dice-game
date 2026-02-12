@@ -19,7 +19,7 @@ A decentralized dice game on Ethereum, implemented in Solidity. Players can plac
 
 ### Game Rules
 
-- Roll is generated pseudo-randomly in the range **5–100**.
+- The game simulates 5 D20 dice rolls summed together. Therefore, the result is generated pseudo-randomly in the range **5–100**.
 - Players can bet `rollUnder` or `rollOver`:
   - `rollUnder = true`: win if dice < target
   - `rollUnder = false`: win if dice > target
@@ -28,15 +28,7 @@ A decentralized dice game on Ethereum, implemented in Solidity. Players can plac
   - Maximum payout capped at **2x**
   - House edge applied in basis points (`houseEdgeBps`)
 
-### Important Events
-
-- `GamePlayed(address indexed player, uint64 indexed gameId, uint256 betAmount, uint256 roll, uint256 payout)`
-- `Paused()`
-- `Unpaused()`
-
----
-
-## Deployment & Initialization
+### Deployment & Initialization
 
 ```solidity
 // Deploy the contract (payable if needed)
@@ -50,9 +42,19 @@ dice.initialize(
 );
 ```
 
+The deploy script can be found in `scripts/deploy.js`. For other operations, we use `query.js`. [Remix](https://remix.ethereum.org/) was used for initial testing, and is recommended for contract deployment and interaction.
+
+The contract is deployed on Sepolia at: `0x355Ed4721D2f4a9e8d428071DAA0B7ef9186D268`.
+
+## Frontend Details
+
+Frontend is built with Vue.js and ethers.js for interaction with the smart contract. It provides a user-friendly interface for placing bets, viewing game history, and displaying results.
+
+For more details, refer to the [README](frontend/README.md) in the `frontend/` directory.
+
 ---
 
-## Usage
+## Code Usage
 
 ### Place a Bet
 
