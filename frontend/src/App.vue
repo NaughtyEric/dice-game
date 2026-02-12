@@ -63,14 +63,30 @@ function duckingBgm(isWin) {
 
       <div class="spacer middle"></div>
 
-      <!-- 右侧下注 Panel -->
-      <DicePanel @result="handleDiceResult" @start="startDiceRolling"/>
+      <div style="display: flex; flex-direction: column;">
+        <div class="game-info">
+          <h3>🎲 How to Play</h3>
+          <p>Roll five 20-sided dice. The closer your total is to the maximum, the bigger your reward!</p>
+          <p>Choose a target number and bet your ETH. Roll under or over to win.</p>
+        </div>
+
+        <!-- 右侧下注 Panel -->
+        <DicePanel @result="handleDiceResult" @start="startDiceRolling"/>
+      </div>
+
       <div class="spacer right"></div>
     </div>
   </div>
 </template>
 
 <style>
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: #0d0d1a; /* 和 #app 背景一致 */
+}
+
 #app {
   min-height: 100vh;
   font-family: "Orbitron", sans-serif;
@@ -102,6 +118,28 @@ function duckingBgm(isWin) {
 }
 .spacer.right {
   flex: 1;
+}
+
+.game-info {
+  max-width: 320px;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 15px 20px;
+  border-radius: 16px;
+  text-align: left;
+  color: #ffdd55;
+  font-size: 0.9rem;
+  font-family: "Orbitron", sans-serif;
+  box-shadow: 0 0 10px #ffdd5588;
+}
+
+.game-info h3 {
+  margin: 0 0 8px 0;
+  font-size: 1.1rem;
+  text-shadow: 0 0 6px #000;
+}
+
+.game-info p {
+  margin: 3px 0;
 }
 
 /* 骰子动画区 */
