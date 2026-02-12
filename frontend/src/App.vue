@@ -3,24 +3,30 @@ import DicePanel from "./components/DicePanel.vue"
 import WalletConnection from "./components/WalletBar.vue"
 import Dice from "@/components/Dice.vue";
 import {ref} from "vue";
+import Bgm from "@/components/bgm.vue";
 
 const diceResult = ref(null)
 const diceRef = ref(null)
 
 function startDiceRolling() {
-  
+  if (diceRef.value) {
+    diceRef.value.startRolling()
+  }
 }
 
 function handleDiceResult(result) {
   diceResult.value = result.roll
   console.log("收到骰子结果:", result)
   if (diceRef.value) {
+    diceRef.value.stopRolling()
     diceRef.value.setResult(result.roll)
   }
 }
 </script>
 
 <template>
+  <!--- Second Dealing - たつろー --->
+  <Bgm />
   <div id="app" class="background">
     <!-- 顶部 Wallet Bar -->
     <WalletConnection />
@@ -37,7 +43,7 @@ function handleDiceResult(result) {
       <div class="spacer middle"></div>
 
       <!-- 右侧下注 Panel -->
-      <DicePanel @result="handleDiceResult" />
+      <DicePanel @result="handleDiceResult" @start="startDiceRolling"/>
 
       <div class="spacer right"></div>
     </div>

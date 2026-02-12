@@ -1,15 +1,16 @@
 <script setup>
 import { ref } from "vue"
 
-const displayedNumber = ref(0)  // 当前显示的数字
-let animationFrame = null       // 动画控制
+const displayedNumber = ref(0)
 
-// 函数：平滑更新数字
+// ====== 平滑动画 ======
+let animationFrame = null
+
 function setResult(target) {
+  cancelAnimationFrame(animationFrame)
+  stopRolling()
 
-  cancelAnimationFrame(animationFrame)  // 取消之前动画
-
-  const duration = 800         // 动画时长：0.8 秒
+  const duration = 800
   const start = displayedNumber.value
   const change = target - start
   const startTime = performance.now()
@@ -27,9 +28,32 @@ function setResult(target) {
   animationFrame = requestAnimationFrame(animate)
 }
 
+// ====== 随机滚动（等待交易用） ======
+let rollingTimer = null
 
-// 暴露函数给父组件使用
-defineExpose({ setResult, displayedNumber })
+function startRolling() {
+  stopRolling()
+
+  rollingTimer = setInterval(() => {
+    // 5 ~ 100
+    displayedNumber.value = Math.floor(Math.random() * 96) + 5
+  }, 40)
+}
+
+function stopRolling() {
+  if (rollingTimer) {
+    clearInterval(rollingTimer)
+    rollingTimer = null
+  }
+}
+
+// ====== 对外暴露能力 ======
+defineExpose({
+  setResult,
+  startRolling,
+  stopRolling,
+  displayedNumber,
+})
 </script>
 
 <template>
@@ -52,6 +76,5 @@ defineExpose({ setResult, displayedNumber })
   color: #ffdd55;
   text-shadow: 0 0 10px #ffdd55aa;
   box-shadow: 0 0 20px #4e4eff88;
-  transition: transform 0.2s ease;
 }
 </style>
