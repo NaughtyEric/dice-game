@@ -3,7 +3,7 @@ import { ref } from "vue"
 import { ethers } from "ethers"
 import DiceABI from "../config/dice_abi.json"
 import { DICE_ADDRESS } from "../config/dice"
-import ResultModal from "./ResultModal.vue"
+import ResultModel from "./ResultModel.vue"
 
 const bet = ref("0.01")
 const target = ref(50)
@@ -54,7 +54,11 @@ async function play() {
         roll: event.args.roll.toString(),
         payout: ethers.formatEther(event.args.payout)
       }
-      emit('result', resultData.value)
+      // emit value & win/lose info
+      emit('result', resultData.value,
+        (rollUnder.value && parseInt(resultData.value.roll) < target.value) ||
+        (!rollUnder.value && parseInt(resultData.value.roll) > target.value)
+      )
 
       // --- 存入 Cookie ---
       const account = window.ethereum.selectedAddress
@@ -78,6 +82,7 @@ async function play() {
     }
   } catch (err) {
     console.error(err)
+    emit('result', 0, false)
     alert("交易失败或用户拒绝")
   }
 
@@ -109,7 +114,7 @@ async function play() {
       <span v-else class="loading">Rolling...</span>
     </button>
 
-    <ResultModal
+    <ResultModel
         v-if="resultData"
         :result="resultData"
         @close="resultData = null"

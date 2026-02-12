@@ -7,6 +7,7 @@ import Bgm from "@/components/bgm.vue";
 
 const diceResult = ref(null)
 const diceRef = ref(null)
+const bgmRef = ref(null)
 
 function startDiceRolling() {
   if (diceRef.value) {
@@ -14,14 +15,34 @@ function startDiceRolling() {
   }
 }
 
-function handleDiceResult(result) {
+function handleDiceResult(result, isWin) {
   diceResult.value = result.roll
   console.log("收到骰子结果:", result)
   if (diceRef.value) {
     diceRef.value.stopRolling()
     diceRef.value.setResult(result.roll)
   }
+  duckingBgm(isWin)
 }
+
+function duckingBgm(isWin) {
+  if (!bgmRef.value) return
+
+  const normalVolume = 0.25
+  const duckVolume = 0.12
+  const fadeDuration = 300 // ms
+
+  if (!isWin) {
+    // 输 → duck
+    bgmRef.value.fadeTo?.(duckVolume, fadeDuration)
+
+    // 2 秒后恢复正常音量
+    setTimeout(() => {
+      bgmRef.value.fadeTo?.(normalVolume, fadeDuration)
+    }, 2000)
+  }
+}
+
 </script>
 
 <template>
@@ -44,7 +65,6 @@ function handleDiceResult(result) {
 
       <!-- 右侧下注 Panel -->
       <DicePanel @result="handleDiceResult" @start="startDiceRolling"/>
-
       <div class="spacer right"></div>
     </div>
   </div>

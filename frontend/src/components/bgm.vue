@@ -48,8 +48,25 @@ function getVolume() {
   return audio.value?.volume ?? 0;
 }
 
+/* ===== 渐变音量方法 ===== */
+function fadeTo(target: number, duration = 500) {
+  if (!audio.value) return;
+  const start = audio.value.volume;
+  const delta = target - start;
+  const startTime = performance.now();
+
+  function step(now: number) {
+    const t = Math.min((now - startTime) / duration, 1);
+    audio.value!.volume = start + delta * t;
+    if (t < 1) requestAnimationFrame(step);
+  }
+
+  requestAnimationFrame(step);
+}
+
 defineExpose({
   setVolume,
   getVolume,
+  fadeTo,  // 新增渐变方法
 });
 </script>
